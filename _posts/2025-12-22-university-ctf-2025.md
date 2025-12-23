@@ -1,5 +1,5 @@
 ---
-title: University CTF 2025: Tinsel Trouble
+title: University CTF 2025
 date: 2025-12-22
 category: CTF
 tags: [Blogs, Writeup, CTF, Forensic, Web]
