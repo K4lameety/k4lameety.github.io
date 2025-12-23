@@ -35,6 +35,6 @@ I am always open to discussing CTF challenges, security research, or collaborati
 
 * [**GitHub**](https://github.com/K4lameety)
 * [**Twitter**](https://twitter.com/K4lameety)
-* [**Email**](mailto:k4lameety.sec@gmail.com)
+* [**Email**](mailto:k4lameety@gmail.com)
 
 > *"Breaking things to fix them."*
