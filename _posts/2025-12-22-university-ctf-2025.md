@@ -32,11 +32,11 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 - **Difficulty:** Easy  
 - **Points:** 1000
 
-### Description & Scenario
+#### Description & Scenario
 
 > Oliver Mirth, Tinselwick's forensic expert, crouched by the glowing lantern post, tracing the shimmerdust trail with a gloved finger. It led into the snowdrifts, then disappeared, no footprints, no sign of a struggle. He glanced up at the flickering Snowglobe atop Sprucetop Tower, its light wavering like a fading star. "Someone’s been tampering with the magic," Oliver murmured. "But why?" He straightened, eyes narrowing. The trail might be gone, but the mystery was just beginning. Can Oliver uncover the secret behind the fading glow?
 
-### Challenge Questions
+#### Challenge Questions
 
 1. What is the Cacti version in use? (e.g. 7.1.0)
 2. What is the set of credentials used to log in to the instance? (e.g., username:password)
@@ -47,7 +47,7 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 7. What is the database password used by Cacti? (e.g. Password123)
 
 
-### 1. Cacti Version
+##### 1. Cacti Version
 
 **Approach:** Search for "Cacti" string in packet details, then follow the HTTP stream.
 
@@ -61,7 +61,7 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 **Answer 1:** `1.2.28`
 
 
-### 2. Login Credentials
+##### 2. Login Credentials
 
 **Approach:** Find the login request (POST to index.php) to get username and password.
 
@@ -72,7 +72,7 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 **Answer 2:** `marnie.thistlewhip:Z4ZP_8QzKA`
 
 
-### 3. Web Shell & Payload Analysis
+##### 3. Web Shell & Payload Analysis
 
 **Approach:** Find all PHP files uploaded by attacker, in order of appearance.
 
@@ -87,7 +87,7 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 
 ---
 
-### 4. Downloaded File
+##### 4. Downloaded File
 
 **Approach:** Find what file was downloaded using curl.
 
@@ -97,7 +97,7 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 
 ---
 
-### 5. PHP Variable Name
+##### 5. PHP Variable Name
 
 **Approach:** Decode the PHP file and find the variable storing command output.
 
@@ -115,7 +115,7 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 
 ---
 
-### 6. System Hostname
+##### 6. System Hostname
 
 **Approach:** Find encrypted hostname output, then decrypt using AES-256-CBC.
 
@@ -133,7 +133,7 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 
 ---
 
-### 7. Database Password
+##### 7. Database Password
 
 **Approach:** Find encrypted database config file output, then decrypt it.
 
@@ -151,6 +151,33 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 **Answer:** `zqvyh2fLgyhZp9KV`
 
 ### Web: Silent Snow
+
+- **Difficulty:** Easy  
+- **Points:** 1000
+
+#### Description & Scenario
+
+> The Snow-Post Owl Society, is responsible for delivering all important news, including this week's festival updates and RSVP confirmations, precisely at midnight. However, a malicious code of the Tinker's growing influence—has corrupted the automation on the official website. As a result, no one is receiving the crucial midnight delivery, which means the village doesn't have the final instructions for the Festival, including the required attire, times, dates, and locations. This is a direct consequence of the Tinker’s logic of restrictive festive code, ensuring that the joyful details are locked away. Your mission is to hack the official Snow-Post Owl Society website and find a way to bypass the corrupted code to trigger a mass resent of the latest article, ensuring the Festival details reach every resident before the lights dim forever.
+
+#### Challenge Question
+
+**How to bypass the corrupted code and trigger a mass resent of the latest article?**
+
+#### Solution
+
 ### Reversing: CloudyCore
+
+- **Difficulty:** Easy  
+- **Points:** 1000
+
+#### Description & Scenario
+
+> Twillie, the memory-minder, was rewinding one of her snowglobes when she overheard a villainous whisper. The scoundrel was boasting about hiding the Starshard's true memory inside this tiny memory core (.tflite). He was so overconfident, laughing that no one would ever think to reverse-engineer a 'boring' ML file. He said he 'left a little challenge for anyone who did,' scrambling the final piece with a simple XOR just for fun. Find the key, reverse the laughably simple XOR, and restore the memory.
+
+#### Challenge Question
+
+**What is the hidden memory/flag inside the .tflite file after reversing the XOR?**
+
+#### Solution
 
 ## Summary
