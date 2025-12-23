@@ -6,16 +6,18 @@ tags: [Blogs, Writeup, CTF, Forensic, Web]
 description: "Writeup for University CTF 2025 by K4lameety."
 ---
 
-# Introduce
+## Introduce
 
 
-# Forensic
-## A Trail of Snow & Deception
+## Forensic
+
+
+### A Trail of Snow & Deception
 
 Difficult: Easy
 Point: 
 
-### Deskripsi & Skenario
+#### Deskripsi & Skenario
 
 > Oliver Mirth, ahli forensik Tinselwick, berjongkok di dekat tiang lentera yang bersinar, menelusuri jejak debu berkilau dengan jari bersarung tangannya.
 > Jejak itu mengarah ke tumpukan salju, lalu menghilang, tanpa jejak kaki,
@@ -28,7 +30,7 @@ Point:
 Dalam challenge **University CTF 2025: Tinsel Trouble** kategori Forensic ini, kita diberikan file PCAP (capture.pcap) dan 7 pertanyaan. Tugas kita adalah membantu Oliver menganalisis jejak digital untuk menemukan siapa dan bagaimana sistem "Snowglobe" disusupi.
 
 
-### Daftar Pertanyaan
+#### Daftar Pertanyaan
 
 > 1. Versi Cacti apa yang digunakan? (misal: 7.1.0)
 > 2. Apa kredensial yang digunakan penyusup? (misal: username:password)
@@ -179,4 +181,4 @@ Setelah itu output akan berupa teks konfigurasi database yang telah didekripsi d
 Difficult: Very Easy
 Point: 
 
-# Summary
+## Summary
