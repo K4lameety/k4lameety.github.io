@@ -6,18 +6,38 @@ tags: [Blogs, Writeup, CTF, Forensic, Web]
 description: "Writeup for University CTF 2025 by K4lameety."
 ---
 
+![Banner](https://s3.eu-central-1.amazonaws.com/htb-ctf-prod-public-storage/ctf/banners/MqUyTLSOoOQppE1kWrgVBhQVTymEs9N0jhlTPc5q.jpg)
+
+## About the Event
+
+### 🎄 Grand Legend — The Tinsel Trouble of Tinselwick
+
+In the snow-glittered village of Tinselwick, where peppermint chimneys puff cinnamon steam and toy trains zip between rooftops, the Festival of Everlight is the most magical night of the year. It's when the Great Snowglobe atop Sprucetop Tower shines brightest, sending cheer across the land and granting every child one heartfelt wish.
+
+But this year… something's gone adorably wrong.
+
+The Snowglobe's glow has flickered. The Wish-Wires have tangled. The Nutcracker Choir is singing in reverse. And strangest of all, a mischievous force known only as The Gingerbit Gremlin has stolen the Starshard Bauble, the ornament that powers the whole Festival!
+
+With the countdown to Everlight Eve ticking fast, eight unlikely helpers—toy-fixers, cocoa-brewers, misfit scouts, and jolly engineers—must rally their sleighs, tighten their scarves, and follow peppermint-crumb trails through snowdrift mazes, puzzle cottages, and gingerbread vaults to recover the stolen magic.
+
+This isn't a battle to save the world—it's a dash to save the spirit of the season.
+
+The Great Snowglobe must sparkle again. And in Tinselwick, even the tiniest heart can outshine the longest night.
 ## Introduce
 
+Halo, Dalam writeup pertama ini, saya akan membahas solusi dari 3 tantangan yang berhasil saya selesaikan sebagai kontribusi untuk Tim saya di University CTF 2025. Mulai dari kategori **Forensic**, **Web**, dan **Pwn**.
 
-## Forensic
+## Challenge
+### Forensic
 
 
-### A Trail of Snow & Deception
+#### A Trail of Snow & Deception
 
 Difficult: Easy
-Point: 
 
-#### Deskripsi & Skenario
+Points: 1000
+
+##### Deskripsi & Skenario
 
 > Oliver Mirth, ahli forensik Tinselwick, berjongkok di dekat tiang lentera yang bersinar, menelusuri jejak debu berkilau dengan jari bersarung tangannya.
 > Jejak itu mengarah ke tumpukan salju, lalu menghilang, tanpa jejak kaki,
@@ -30,18 +50,18 @@ Point:
 Dalam challenge **University CTF 2025: Tinsel Trouble** kategori Forensic ini, kita diberikan file PCAP (capture.pcap) dan 7 pertanyaan. Tugas kita adalah membantu Oliver menganalisis jejak digital untuk menemukan siapa dan bagaimana sistem "Snowglobe" disusupi.
 
 
-#### Daftar Pertanyaan
+##### Daftar Pertanyaan
 
-> 1. Versi Cacti apa yang digunakan? (misal: 7.1.0)
-> 2. Apa kredensial yang digunakan penyusup? (misal: username:password)
-> 3. Tiga file PHP berbahaya terlibat dalam serangan ini. Berdasarkan urutan kemunculannya di aliran jaringan. Apa saja file tersebut ? (misal: file1.php, file2.php, file3.php)
-> 4. File apa yang diunduh menggunakan curl selama proses eksploitasi? (misal: filename)
-> 5. Apa nama variabel dalam salah satu dari tiga file PHP berbahaya yang menyimpan hasil perintah sistem yang dieksekusi? (misal: $q5ghsA)
-> 6. Apa nama host mesin sistemnya? (misal: server01)
-> 7. Apa kata sandi databse yang digunakan oleh Cacti? (misal: Password123)
+> 1. What is the Cacti version in use? (e.g. 7.1.0)
+> 2. What is the set of credentials used to log in to the instance? (e.g., username:password)
+> 3. Three malicious PHP files are involved in the attack. In order of appearance in the network stream, what are they? (e.g., file1.php,file2.php,file3.php)
+> 4. What file gets downloaded using curl during exploitation process? (e.g. filename)
+> 5. What is the name of the variable in one of the three malicious PHP files that stores the result of the executed system command? (e.g., $q5ghsA)
+> 6. What is the system machine hostname? (e.g. server01)
+> 7. What is the database password used by Cacti? (e.g. Password123)
 
 
-#### 1. Versi Cacti yang Digunakan
+##### 1. Versi Cacti yang Digunakan
 
 Karena Kita sudah diberi tahu nama aplikasi yang berjalan (Cacti), Saya memulai dengan mencari Packet Detail yang berisi string **Cacti**. Saya langsung menemukan packet 357 yang terindikasi berisi string **Cacti**.
 
@@ -54,7 +74,7 @@ Setelah itu Saya mencari versi **Cacti** dengan mengikuti HTTP Stream **Packet 3
 **Jawaban 1:** **1.2.28**
 
 
-#### 2. Kredensial Login
+##### 2. Kredensial Login
 
 Penyusup melakukan login ke dashboard (index.php). Dengan memfilter request POST ke `index.php`, Saya langsung menemukan 1 Packet berisi username dan password dengan mudah saat menganalisis Packet tersebut.
 
@@ -65,7 +85,7 @@ http.request.method == POST && http.request.uri contains "index.php"
 **Jawaban 2:** **marnie.thistlewhip:Z4ZP_8QzKA**
 
 
-#### 3. Analisis Web Shell & Payload
+##### 3. Analisis Web Shell & Payload
 
 > Berisi Jawaban 3-5
 
@@ -119,7 +139,7 @@ echo base64_encode($A4gVaQdF);
 
 Dari hasil dekripsi di atas, kita dapat melihat bahwa nama variabel yang menyimpan hasil eksekusi perintah sistem adalah **$a54vag**. Dan juga ada indikasi penggunaan enkripsi AES-256-CBC untuk mengamankan output tersebut.
 
-#### 4. Dekripsi Data Konfigurasi
+##### 4. Dekripsi Data Konfigurasi
 
 Setelah mendapatkan akses ke web shell, penyusup mencoba untuk mengekstrak informasi sensitif dari server, seperti hostname sistem dan password database. Namun, informasi ini ditemukan dalam keadaan terenkripsi. Saya menggunakan informasi dari web shell sebelumnya untuk mendekripsi data ini.
 
@@ -143,7 +163,7 @@ Di saat mencari jawaban ke 3 tadi, ternyata payload di q= pada file terakhir (f5
 
 Hasil diatas memudahkan Saya untuk menemukan Packet Detail yang berisi output terenkripsi dari perintah `hostname` dan isi file `include/config.php` yang berisi password database.
 
-#### A. Temukan Hostname
+##### A. Temukan Hostname
 
 Analisis Packet Detail dari perintah `hostname` menunjukkan bahwa hostname sistem disimpan dalam bentuk terenkripsi. Saya menggunakan kunci dan IV yang sama dari web shell untuk mendekripsi hostname tersebut dengan CyberChef.
 
@@ -158,7 +178,7 @@ Result: tinselmon01
 
 **Jawaban 6:** **tinselmon01**
 
-#### B. Database Password
+##### B. Database Password
 
 Selanjutnya, Saya menganalisis output terenkripsi dari file konfigurasi database yang ditemukan di `include/config.php`. Saya menggunakan metode dekripsi yang sama untuk mendapatkan password database.
 
@@ -175,10 +195,10 @@ Setelah itu output akan berupa teks konfigurasi database yang telah didekripsi d
 
 **Jawaban 7:** **zqvyh2fLgyhZp9KV**
 
-## Web
-### Silent Snow
+### Web
+#### Silent Snow
 
-Difficult: Very Easy
-Point: 
+> Difficult: Very Easy
+> Point: 
 
 ## Summary
