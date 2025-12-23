@@ -69,21 +69,25 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 
 **Steps:**
 1. Use Wireshark filter: `http.request.method == POST && http.request.uri contains "index.php"`
-2. Analyze packet → Extract credentials from POST data
+2. Follow TCP Stream → Search the creds in response
+
+![Analysis](./assets/img/2025-12-22-university-ctf-2025/forensic-3.png)
+![Get Username:Password](./assets/img/2025-12-22-university-ctf-2025/forensic-4.png)
 
 **Answer 2:** `marnie.thistlewhip:Z4ZP_8QzKA`
 
 
 ##### 3. Web Shell & Payload Analysis
 
-**Approach:** Find all PHP files uploaded by attacker, in order of appearance.
+**Approach:** Find 3 PHP files uploaded by attacker, in order of appearance.
 
 **Steps:**
 1. Filter: `http.request.method == GET and http.request.uri contains ".php"`
-2. Note the order files appear in network stream
+2. Mark the order files appear in network stream
 3. These are the malicious PHP backdoors
+4. The third file has a parameter q that is encrypted in base64 (note)
 
-![Version cacti](https://i.ibb.co.com/8LkrKNjL/Screenshot-2025-12-22-180639.png)
+![3 Files](./assets/img/2025-12-22-university-ctf-2025/forensic-5.png)
 
 **Answer 3:** `JWuA5a1yj.php,ornf85gfQ.php,f54Avbg4.php`
 
@@ -92,6 +96,8 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 **Approach:** Find what file was downloaded using curl.
 
 **Filter:** `http.request.method == GET and http.user_agent contains "curl"`
+
+![This files](./assets/img/2025-12-22-university-ctf-2025/forensic-6.png)
 
 **Answer 4:** `bash`
 
@@ -103,6 +109,11 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 1. Decode Base64 PHP code from the web shell
 2. Find `shell_exec()` function call
 3. Identify variable that stores the output
+4. There is evidence of AES encryption usage (note)
+
+![This files](./assets/img/2025-12-22-university-ctf-2025/forensic-6.png)
+![After Open](./assets/img/2025-12-22-university-ctf-2025/forensic-7.png)
+![After Decrypt](./assets/img/2025-12-22-university-ctf-2025/forensic-8.png)
 
 **Key Code Line:**
 ```php
@@ -116,14 +127,16 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 **Approach:** Find encrypted hostname output, then decrypt using AES-256-CBC.
 
 **Steps:**
-1. Search for packet with `hostname` command execution
+1. Search for packet with `hostname` command execution (in the q parameter of the third file mentioned earlier)
 2. Find encrypted response in packet details
 3. Use CyberChef with:
    - **Algorithm:** AES Decrypt
    - **Key:** `kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G`
    - **IV:** `pZ7qR1tLw8Df3XbK`
-   - **Input format:** Base64
-   - **Output format:** UTF8
+   - **Input format:** <encrypted_response>
+   - **Output format:** <hosename>
+
+(Key & IV derived from the AES encryption evidence found earlier)
 
 **Answer:** `tinselmon01`
 
