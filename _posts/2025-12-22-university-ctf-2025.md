@@ -1,9 +1,9 @@
 ---
-title: A Trail of Snow and Deception
+title: University CTF 2025: Tinsel Trouble
 date: 2025-12-22
-category: Forensic
-tags: [ctf, forensic, wireshark, network-analysis, cacti, webshell, php, encryption]
-description: "Forensic Writeup: Analisis trafik jaringan pada Cacti Server yang disusupi."
+category: CTF
+tags: [Blogs, Writeup, CTF, Forensic, Web]
+description: "Writeup for University CTF 2025 by K4lameety."
 ---
 
 ## Deskripsi & Skenario
