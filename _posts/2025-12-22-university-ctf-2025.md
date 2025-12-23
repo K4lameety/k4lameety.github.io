@@ -27,7 +27,8 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 
 ## Challenges
 
-### Forensic: A Trail of Snow & Deception
+### **Forensic: A Trail of Snow & Deception**
+---
 
 - **Difficulty:** Easy  
 - **Points:** 1000
@@ -46,6 +47,7 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 6. What is the system machine hostname? (e.g. server01)
 7. What is the database password used by Cacti? (e.g. Password123)
 
+#### Solution
 
 ##### 1. Cacti Version
 
@@ -55,8 +57,8 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 1. Filter packets containing "Cacti" → Found **Packet 357**
 2. Follow HTTP Stream → Shows the version in response
 
-![Packet 357](https://i.ibb.co.com/p6yHhk34/Screenshot-2025-12-22-170000.png)
-![Version cacti](https://i.ibb.co.com/BHYwr7Vc/Screenshot-2025-12-22-170829.png)
+![Filter Packet](./assets/img/2025-12-22-university-ctf-2025/forensic-1.png)
+![Get Version](./assets/img/2025-12-22-university-ctf-2025/forensic-2.png)
 
 **Answer 1:** `1.2.28`
 
@@ -85,8 +87,6 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 
 **Answer 3:** `JWuA5a1yj.php,ornf85gfQ.php,f54Avbg4.php`
 
----
-
 ##### 4. Downloaded File
 
 **Approach:** Find what file was downloaded using curl.
@@ -94,8 +94,6 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 **Filter:** `http.request.method == GET and http.user_agent contains "curl"`
 
 **Answer 4:** `bash`
-
----
 
 ##### 5. PHP Variable Name
 
@@ -113,8 +111,6 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 
 **Answer:** `$a54vag`
 
----
-
 ##### 6. System Hostname
 
 **Approach:** Find encrypted hostname output, then decrypt using AES-256-CBC.
@@ -130,8 +126,6 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
    - **Output format:** UTF8
 
 **Answer:** `tinselmon01`
-
----
 
 ##### 7. Database Password
 
@@ -150,10 +144,13 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 
 **Answer:** `zqvyh2fLgyhZp9KV`
 
-### Web: Silent Snow
+---
+
+### **Web: Silent Snow**
+---
 
 - **Difficulty:** Easy  
-- **Points:** 1000
+- **Points:** 975
 
 #### Description & Scenario
 
@@ -165,10 +162,13 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 
 #### Solution
 
-### Reversing: CloudyCore
+---
+
+### **Reversing: CloudyCore**
+---
 
 - **Difficulty:** Easy  
-- **Points:** 1000
+- **Points:** 975
 
 #### Description & Scenario
 
@@ -179,5 +179,7 @@ $a54vag = shell_exec($A4gVaXzY);  // ← This stores command output
 **What is the hidden memory/flag inside the .tflite file after reversing the XOR?**
 
 #### Solution
+
+---
 
 ## Summary
