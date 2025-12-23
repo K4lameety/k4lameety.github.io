@@ -6,7 +6,16 @@ tags: [Blogs, Writeup, CTF, Forensic, Web]
 description: "Writeup for University CTF 2025 by K4lameety."
 ---
 
-## Deskripsi & Skenario
+# Introduce
+
+
+# Forensic
+## A Trail of Snow & Deception
+
+Difficult: Easy
+Point: 
+
+### Deskripsi & Skenario
 
 > Oliver Mirth, ahli forensik Tinselwick, berjongkok di dekat tiang lentera yang bersinar, menelusuri jejak debu berkilau dengan jari bersarung tangannya.
 > Jejak itu mengarah ke tumpukan salju, lalu menghilang, tanpa jejak kaki,
@@ -30,7 +39,7 @@ Dalam challenge **University CTF 2025: Tinsel Trouble** kategori Forensic ini, k
 > 7. Apa kata sandi databse yang digunakan oleh Cacti? (misal: Password123)
 
 
-## 1. Versi Cacti yang Digunakan
+#### 1. Versi Cacti yang Digunakan
 
 Karena Kita sudah diberi tahu nama aplikasi yang berjalan (Cacti), Saya memulai dengan mencari Packet Detail yang berisi string **Cacti**. Saya langsung menemukan packet 357 yang terindikasi berisi string **Cacti**.
 
@@ -43,7 +52,7 @@ Setelah itu Saya mencari versi **Cacti** dengan mengikuti HTTP Stream **Packet 3
 **Jawaban 1:** **1.2.28**
 
 
-## 2. Kredensial Login
+#### 2. Kredensial Login
 
 Penyusup melakukan login ke dashboard (index.php). Dengan memfilter request POST ke `index.php`, Saya langsung menemukan 1 Packet berisi username dan password dengan mudah saat menganalisis Packet tersebut.
 
@@ -54,7 +63,7 @@ http.request.method == POST && http.request.uri contains "index.php"
 **Jawaban 2:** **marnie.thistlewhip:Z4ZP_8QzKA**
 
 
-## 3. Analisis Web Shell & Payload
+#### 3. Analisis Web Shell & Payload
 
 > Berisi Jawaban 3-5
 
@@ -70,7 +79,7 @@ Berdasarkan urutan waktu dalam stream jaringan, file-file tersebut adalah:
 
 **Jawaban 3:** **JWuA5a1yj.php,ornf85gfQ.php,f54Avbg4.php**
 
-### Eksekusi Perintah & Download File
+##### Eksekusi Perintah & Download File
 
 Kemudian Penyusup menggunakan perintah `curl` untuk mengunduh binary eksternal ke server target. Disini Saya mencari manual Packet Detail yang berisi string **curl**.
 Tapi untuk menghemat waktu, Saya sarankan menggunakan Wireshark Filter berikut:
@@ -83,7 +92,7 @@ Dan akan langsung muncul beberapa nama file yang setelah saya coba satu-satu ter
 
 **Jawaban 4:** **bash**
 
-### Analisis Variabel PHP
+##### Analisis Variabel PHP
 
 Dalam file **bash** yang baru saja kita analisis tersebut terdapat variabel yang digunakan untuk menyimpan output dari fungsi eksekusi sistem (seperti `shell_exec`) namun di enkripsi dengan Base64.
 
@@ -108,7 +117,7 @@ echo base64_encode($A4gVaQdF);
 
 Dari hasil dekripsi di atas, kita dapat melihat bahwa nama variabel yang menyimpan hasil eksekusi perintah sistem adalah **$a54vag**. Dan juga ada indikasi penggunaan enkripsi AES-256-CBC untuk mengamankan output tersebut.
 
-## 4. Dekripsi Data Konfigurasi
+#### 4. Dekripsi Data Konfigurasi
 
 Setelah mendapatkan akses ke web shell, penyusup mencoba untuk mengekstrak informasi sensitif dari server, seperti hostname sistem dan password database. Namun, informasi ini ditemukan dalam keadaan terenkripsi. Saya menggunakan informasi dari web shell sebelumnya untuk mendekripsi data ini.
 
@@ -132,7 +141,7 @@ Di saat mencari jawaban ke 3 tadi, ternyata payload di q= pada file terakhir (f5
 
 Hasil diatas memudahkan Saya untuk menemukan Packet Detail yang berisi output terenkripsi dari perintah `hostname` dan isi file `include/config.php` yang berisi password database.
 
-### A. Temukan Hostname
+#### A. Temukan Hostname
 
 Analisis Packet Detail dari perintah `hostname` menunjukkan bahwa hostname sistem disimpan dalam bentuk terenkripsi. Saya menggunakan kunci dan IV yang sama dari web shell untuk mendekripsi hostname tersebut dengan CyberChef.
 
@@ -147,7 +156,7 @@ Result: tinselmon01
 
 **Jawaban 6:** **tinselmon01**
 
-### B. Database Password
+#### B. Database Password
 
 Selanjutnya, Saya menganalisis output terenkripsi dari file konfigurasi database yang ditemukan di `include/config.php`. Saya menggunakan metode dekripsi yang sama untuk mendapatkan password database.
 
@@ -163,3 +172,11 @@ Result: (Berupa teks)
 Setelah itu output akan berupa teks konfigurasi database yang telah didekripsi dan berisi password.
 
 **Jawaban 7:** **zqvyh2fLgyhZp9KV**
+
+## Web
+### Silent Snow
+
+Difficult: Very Easy
+Point: 
+
+# Summary
