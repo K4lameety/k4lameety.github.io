@@ -23,7 +23,7 @@ The Great Snowglobe must sparkle again. And in Tinselwick, even the tiniest hear
 
 ## Introduction
 
-Hello, In this writeup, I will discuss solutions for 3 challenges that I successfully solved as a contribution to my team in this event. Starting from the **Forensic**, **Web**, and **Reversing** categories. I will explain them in a very simple way so they are easy to understand.
+Hello, In this writeup, I will discuss solutions for 2 challenges that I successfully solved as a contribution to my team in this event. Starting from the **Forensic**, and **Reversing** categories. I will explain them in a very simple way so they are easy to understand.
 
 ## Challenges
 
@@ -175,54 +175,6 @@ echo base64_encode($A4gVaQdF);
 
 ---
 
-### **Web: Silent Snow**
----
-
-- **Difficulty:** Easy  
-- **Points:** 975
-
-#### Description & Scenario
-
-> The Snow-Post Owl Society, is responsible for delivering all important news, including this week's festival updates and RSVP confirmations, precisely at midnight. However, a malicious code of the Tinker's growing influence—has corrupted the automation on the official website. As a result, no one is receiving the crucial midnight delivery, which means the village doesn't have the final instructions for the Festival, including the required attire, times, dates, and locations. This is a direct consequence of the Tinker’s logic of restrictive festive code, ensuring that the joyful details are locked away. Your mission is to hack the official Snow-Post Owl Society website and find a way to bypass the corrupted code to trigger a mass resent of the latest article, ensuring the Festival details reach every resident before the lights dim forever.
-
-#### Challenge Question
-
-**How to bypass the corrupted code and trigger a mass resent of the latest article?**
-
-#### Solusi
-
-##### Pengintaian (Reconnaissance)
-
-Setelah mengaudit target, saya menemukan instance WordPress yang menjalankan tema khusus dan plugin khusus. Kode sumber plugin mengungkapkan dua cacat utama:
-
-1. **Hook Auto-login:** Pengguna baru secara otomatis masuk menggunakan alur `user_register` → `wp_set_auth_cookie`.
-
-2. **Penulisan Opsi Tanpa Autentikasi:** Fungsi `init()` memeriksa `?settings` dan memanggil `admin_page()` tanpa pemeriksaan autentikasi apa pun. Ini memungkinkan memanggil `update_option()` melalui parameter POST.
-
-##### Rantai Eksploitasi
-
-**1. Penulisan Opsi Tanpa Autentikasi**
-
-Saya menyalahgunakan `admin_page()` yang rentan melalui `wp-admin/admin-ajax.php?settings=1`. Dengan mengirim permintaan POST, saya berhasil mengaktifkan registrasi terbuka dan menetapkan peran default ke Administrator.
-
-**2. Eskalasi Privilese**
-
-Setelah mengaktifkan registrasi, saya menavigasi ke `/wp-login.php?action=register` dan membuat akun baru. Karena hook auto-login plugin, saya diberi privilese Administrator secara instan.
-
-**3. Eksekusi Kode melalui Editor Tema**
-
-Setelah saya memiliki akses Administrator, saya menavigasi ke Appearance → Theme File Editor. Saya memilih file `functions.php` dari tema yang aktif dan menyuntikkan payload khusus untuk membaca flag.
-
-**4. Pengambilan Flag**
-
-Akhirnya, setelah memperbarui file, saya memicu payload dengan mengunjungi halaman beranda dengan parameter spesifik yang saya tentukan:
-
-```
-URL: http://<TARGET_IP>:<PORT>/?readflag=1
-```
-
----
-
 ### **Reversing: CloudyCore**
 ---
 
@@ -239,7 +191,7 @@ URL: http://<TARGET_IP>:<PORT>/?readflag=1
 
 #### Solution
 
-##### Step 1: Open Model with Netron
+##### Open Model with Netron
 
 **Approach:** Analyze .tflite model architecture using Netron.
 
@@ -252,7 +204,7 @@ URL: http://<TARGET_IP>:<PORT>/?readflag=1
 
 ![Image](./assets/img/2025-12-22-university-ctf-2025/rev-1.png)
 
-##### Step 2: Extract Raw Bytes from Tensor
+##### Extract Raw Bytes from Tensor
 
 **Approach:** Recover actual byte values (Type Confusion issue).
 
@@ -265,9 +217,54 @@ URL: http://<TARGET_IP>:<PORT>/?readflag=1
 - Tensor 1x4: `k3y!`
 - Tensor 9x1: Hex payload starting with `13af8a29...`
 
+```
+import tensorflow as tf
+import numpy as np
+
+# Challenge file
+MODEL_PATH = "snownet_stronger.tflite"
+
+def extract_hidden_data():
+    # Load the model
+    interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
+    interpreter.allocate_tensors()
+
+    print("[*] Searching for hidden data...")
+
+    # Check the storage boxes (tensors) one by one
+    for tensor in interpreter.get_tensor_details():
+        # We only look for small boxes to keep the log clean
+        # np.prod calculates total elements (e.g., 1x4 = 4)
+        if np.prod(tensor['shape']) < 50: 
+            try:
+                # Get the data (still in weird float format)
+                data_float = interpreter.get_tensor(tensor['index'])
+                
+                # Convert that weird float back to its original form (Bytes/Hex)
+                raw_data = data_float.tobytes()
+                
+                # Show results
+                print(f"\n[+] Found Tensor: {tensor['name']}")
+                print(f"    Hex (Raw): {raw_data.hex()}")
+                
+                # Try to read it as normal text
+                try:
+                    # Filter for readable characters only
+                    text = "".join([chr(b) if 32 <= b <= 126 else "." for b in raw_data])
+                    print(f"    Readable Text: {text}")
+                except:
+                    pass
+
+            except ValueError:
+                continue
+
+if __name__ == "__main__":
+    extract_hidden_data()
+```
+
 ![Image](./assets/img/2025-12-22-university-ctf-2025/rev-2.png)
 
-##### Step 3: XOR Decryption
+##### XOR Decryption
 
 **Approach:** Decrypt payload using key k3y! with simple XOR.
 
@@ -276,7 +273,7 @@ URL: http://<TARGET_IP>:<PORT>/?readflag=1
 2. XOR each byte with key `k3y!` (cycling)
 3. Result: `789cf308...` (Zlib magic bytes)
 
-##### Step 4: Zlib Decompress
+##### Zlib Decompress
 
 **Approach:** Decompress XOR result using zlib.
 
@@ -307,4 +304,5 @@ print(flag.decode())
 
 ---
 
-## Summary
+Thank you for reading !
+Don't forget to follow me on X: @K4lameety
