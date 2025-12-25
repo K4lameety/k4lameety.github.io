@@ -16,10 +16,11 @@ timezone: Asia/Jakarta
 
 title: K4lameety # the main title
 
-tagline: Breaking things to fix them. # it will display as the subtitle
+tagline: Uncovering the stories hidden in every byte. # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
-  CTF blogs, cybersecurity research, and travel notes on learning ethical hacking.
+  CTF writeups, digital forensics investigation logs, and reverse engineering research. 
+  Documenting my journey to becoming a Lead Forensic Investigator.
 
 # Fill in the protocol & hostname for your site.
 # E.g. 'https://username.github.io', note that it does not end with a '/'.

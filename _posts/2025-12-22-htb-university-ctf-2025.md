@@ -1,9 +1,9 @@
 ---
 title: "HTB University CTF 2025: Tinsel Trouble"
 date: 2025-12-22 09:00:00 +0700
-categories: [Writeups, Forensic]
-tags: [ctf, htb, network, aes, tflite, xor]
-description: "Deep dive analysis of Tinsel Trouble: Decrypting AES-256-CBC network streams and reversing TFLite Machine Learning models."
+categories: [Writeups, Multi-Category]
+tags: [ctf, htb, forensic, reversing]
+description: "Writeups for HTB University CTF 2025: Analyzing encrypted Cacti network traffic and reversing TFLite Machine Learning models."
 image:
   path: https://s3.eu-central-1.amazonaws.com/htb-ctf-prod-public-storage/ctf/banners/MqUyTLSOoOQppE1kWrgVBhQVTymEs9N0jhlTPc5q.jpg
   alt: HTB University CTF 2025 Banner
