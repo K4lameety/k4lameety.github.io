@@ -5,6 +5,9 @@ categories: [Journey, Roadmap]
 tags: [roadmap, dfir, career, learning-path]
 pin: true
 description: "A formal declaration of my 4-month intensive journey to master Digital Forensics and Reverse Engineering."
+image:
+  path: https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070
+  alt: Professional Cyber Security Lab Environment
 ---
 
 # 🛡️ Mission Objective: Mastering the Bytes
