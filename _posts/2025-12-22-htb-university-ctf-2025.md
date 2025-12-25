@@ -1,12 +1,14 @@
 ---
-title: HTB University CTF 2025
-date: 2025-12-22
-category: CTF
-tags: [Blogs, Writeup, CTF, Forensic, Web, Reversing]
-description: "Writeup for University CTF 2025 by K4lameety."
+title: "HTB University CTF 2025: Tinsel Trouble"
+date: 2025-12-22 09:00:00 +0700
+categories: [Writeups, Forensics]
+tags: [ctf, htb, network, aes, tflite, xor]
+description: "Deep dive analysis of Tinsel Trouble: Decrypting AES-256-CBC network streams and reversing TFLite Machine Learning models."
+image:
+  path: https://s3.eu-central-1.amazonaws.com/htb-ctf-prod-public-storage/ctf/banners/MqUyTLSOoOQppE1kWrgVBhQVTymEs9N0jhlTPc5q.jpg
+  alt: HTB University CTF 2025 Banner
 ---
 
-![Banner](https://s3.eu-central-1.amazonaws.com/htb-ctf-prod-public-storage/ctf/banners/MqUyTLSOoOQppE1kWrgVBhQVTymEs9N0jhlTPc5q.jpg)
 # 🎄 Grand Legend — The Tinsel Trouble of Tinselwick
 
 In the snow-glittered village of Tinselwick, where peppermint chimneys puff cinnamon steam and toy trains zip between rooftops, the Festival of Everlight is the most magical night of the year. It's when the Great Snowglobe atop Sprucetop Tower shines brightest, sending cheer across the land and granting every child one heartfelt wish.
@@ -57,8 +59,8 @@ Hello, In this writeup, I will discuss solutions for 2 challenges that I success
 1. Filter packets containing "Cacti" → Found **Packet 357**
 2. Follow HTTP Stream → Shows the version in response
 
-![Filter Packet](./assets/img/2025-12-22-university-ctf-2025/forensic-1.png)
-![Get Version](./assets/img/2025-12-22-university-ctf-2025/forensic-2.png)
+![Filter Packet](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-1.png)
+![Get Version](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-2.png)
 
 **Answer 1:** `1.2.28`
 
@@ -71,8 +73,8 @@ Hello, In this writeup, I will discuss solutions for 2 challenges that I success
 1. Use Wireshark filter: `http.request.method == POST && http.request.uri contains "index.php"`
 2. Follow TCP Stream → Search the creds in response
 
-![Analysis](./assets/img/2025-12-22-university-ctf-2025/forensic-3.png)
-![Get Username:Password](./assets/img/2025-12-22-university-ctf-2025/forensic-4.png)
+![Analysis](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-3.png)
+![Get Username:Password](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-4.png)
 
 **Answer 2:** `marnie.thistlewhip:Z4ZP_8QzKA`
 
@@ -87,7 +89,7 @@ Hello, In this writeup, I will discuss solutions for 2 challenges that I success
 3. These are the malicious PHP backdoors
 4. The third file has a parameter q that is encrypted in base64 (note)
 
-![3 Files](./assets/img/2025-12-22-university-ctf-2025/forensic-5.png)
+![3 Files](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-5.png)
 
 **Answer 3:** `JWuA5a1yj.php,ornf85gfQ.php,f54Avbg4.php`
 
@@ -97,7 +99,7 @@ Hello, In this writeup, I will discuss solutions for 2 challenges that I success
 
 **Filter:** `http.request.method == GET and http.user_agent contains "curl"`
 
-![This files](./assets/img/2025-12-22-university-ctf-2025/forensic-6.png)
+![This files](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-6.png)
 
 **Answer 4:** `bash`
 
@@ -111,9 +113,9 @@ Hello, In this writeup, I will discuss solutions for 2 challenges that I success
 3. Identify variable that stores the output
 4. There is evidence of AES encryption usage (note)
 
-![This files](./assets/img/2025-12-22-university-ctf-2025/forensic-6.png)
-![After Open](./assets/img/2025-12-22-university-ctf-2025/forensic-7.png)
-![After Decrypt](./assets/img/2025-12-22-university-ctf-2025/forensic-8.png)
+![This files](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-6.png)
+![After Open](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-7.png)
+![After Decrypt](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-8.png)
 
 **Key Code Line:**
 ```
@@ -143,10 +145,10 @@ echo base64_encode($A4gVaQdF);
 
 (Key & IV derived from the AES encryption evidence found earlier)
 
-![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-9.png)
-![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-10.png)
-![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-11.png)
-![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-12.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-9.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-10.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-11.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-12.png)
 
 **Answer:** `tinselmon01`
 
@@ -166,10 +168,10 @@ echo base64_encode($A4gVaQdF);
    - **Output format:** (database configuration)
 5. Parse the config file to find `password` field
 
-![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-13.png)
-![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-14.png)
-![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-15.png)
-![Image](./assets/img/2025-12-22-university-ctf-2025/forensic-16.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-13.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-14.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-15.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/forensic-16.png)
 
 **Answer:** `zqvyh2fLgyhZp9KV`
 
@@ -202,7 +204,7 @@ echo base64_encode($A4gVaQdF);
    - Tensor 1x4 (likely key/short string)
    - Tensor 9x1 (likely encrypted payload)
 
-![Image](./assets/img/2025-12-22-university-ctf-2025/rev-1.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/rev-1.png)
 
 ##### Extract Raw Bytes from Tensor
 
@@ -262,7 +264,7 @@ if __name__ == "__main__":
     extract_hidden_data()
 ```
 
-![Image](./assets/img/2025-12-22-university-ctf-2025/rev-2.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/rev-2.png)
 
 ##### XOR Decryption
 
@@ -298,7 +300,7 @@ flag = zlib.decompress(decrypted_data)
 print(flag.decode())
 ```
 
-![Image](./assets/img/2025-12-22-university-ctf-2025/rev-3.png)
+![Image](./assets/img/writeups/2025-12-22-university-ctf-2025/rev-3.png)
 
 **Answer:** `HTB{Cl0udy_C0r3_R3v3rs3d}`
 
